@@ -1,11 +1,30 @@
 const ctx = document.getElementById('myChart').getContext('2d');
+// const labels = Utils.months({count: 7});
+// const data = {
+//   labels: labels,
+//   datasets: [{
+//     label: 'My First Dataset',
+//     data: [65, 59, 80, 81, 56, 55, 40],
+//     fill: false,
+//     borderColor: 'rgb(75, 192, 192)',
+//     tension: 0.1
+//   }]
+// };
+
+var n = [];
+var arr = [];
+for(i=1;i<=365*2;i++){
+    n.push(i);
+    arr.push(Math.floor(Math.random()*(100-50+1))+50);
+};
+
 const myChart = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: n,
         datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
+            label: '# of search',
+            data: arr,
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
