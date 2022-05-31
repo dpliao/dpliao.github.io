@@ -67,10 +67,10 @@ am5.ready(function() {
     
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var brands = ['TSMC', 'Applied Materials', 'ASML', 'SUMCO']
-    var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b']
+    var brands = ['TSMC', 'Applied Materials', 'ASML', 'SUMCO', 'TSMC-predicted', 'Applied Materials-predicted', 'ASML-predicted', 'SUMCO-predicted']
+    var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b', '#70bbf7','#ef8179', '#f6c940', '#69a86b']
 
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 8; i++) {
       var series = chart.series.push(am5xy.LineSeries.new(root, {
         name: brands[i],
         stroke: line_colors[i],
@@ -85,12 +85,22 @@ am5.ready(function() {
         })
       }));
       series.set("fill", am5.color(line_colors[i]));
-
-      date = new Date(2020, 0, 0);
+      series.strokes.template.set({
+        strokeDasharray: [2, 2],
+        strokeWidth: 2
+      });
+      if(i > 4) date = new Date(2020, 0, 0);
+      else {
+        date = new Date(2021, 0, 0);
+        series.strokes.template.setAll({
+          strokeDasharray: [2, 4],
+          strokeWidth: 2
+        });
+      }
       date.setHours(0, 0, 0, 0);
       value = 0;
     
-      var data = generateDatas(700);
+      var data = generateDatas(365);
       series.data.setAll(data);
     
       
@@ -123,7 +133,7 @@ am5.ready(function() {
     var legend = chart.rightAxesContainer.children.push(am5.Legend.new(root, {
       width: 200,
       paddingLeft: 15,
-      height: am5.percent(150),
+      height: am5.percent(100),
     }));
     
     // When legend item container is hovered, dim all the series except the hovered one
