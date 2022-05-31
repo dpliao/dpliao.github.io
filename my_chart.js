@@ -20,7 +20,7 @@ var arr = {'TSMC':[], 'ASML':[]};
 for(i=1;i<=200*2;i++){
     n.push(i);
     arr['TSMC'].push(getRandom(50, 100));
-    arr['ASML'].push(getRandom(50, 100));
+    arr['ASML'].push(getRandom(0, 50));
 };
 
 const myChart = new Chart(ctx, {
