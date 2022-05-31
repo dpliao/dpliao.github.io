@@ -1,10 +1,11 @@
+
 am5.ready(function() {
 
     // Create root element
     // https://www.amcharts.com/docs/v5/getting-started/#Root_element 
     var root = am5.Root.new("chartdiv");
     
-    
+    // readTextFile('sample.csv')
     // Set themes
     // https://www.amcharts.com/docs/v5/concepts/themes/ 
     root.setThemes([
@@ -31,6 +32,7 @@ am5.ready(function() {
     function generateData() {
       value = Math.round((Math.random() * 10 - 4.2) + value);
       am5.time.add(date, "day", 1);
+    //   console.log(date.getTime());
       return {
         date: date.getTime(),
         value: value
@@ -167,7 +169,6 @@ am5.ready(function() {
     
     // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
     legend.data.setAll(chart.series.values);
-    
     
     // Make stuff animate on load
     // https://www.amcharts.com/docs/v5/concepts/animations/
