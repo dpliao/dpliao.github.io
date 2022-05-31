@@ -65,34 +65,38 @@ am5.ready(function() {
     
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var brand = ['TSMC', 'Applied Materials', 'ASML', 'SUMCO']
+    var brands = ['TSMC', 'Applied Materials', 'ASML', 'SUMCO']
+    var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b']
+
     for (var i = 0; i < 4; i++) {
       var series = chart.series.push(am5xy.LineSeries.new(root, {
-        name: brand[i],
+        name: brands[i],
+        stroke: line_colors[i],
         xAxis: xAxis,
         yAxis: yAxis,
         valueYField: "value",
         valueXField: "date",
         legendValueText: "{valueY}",
         tooltip: am5.Tooltip.new(root, {
-          pointerOrientation: "horizontal",
+          pointerOrientation: "vertical",
           labelText: "{valueY}"
         })
       }));
-    
-      date = new Date();
+      series.set("fill", am5.color(line_colors[i]));
+
+      date = new Date(2020, 0, 0);
       date.setHours(0, 0, 0, 0);
       value = 0;
     
-      var data = generateDatas(100);
+      var data = generateDatas(700);
       series.data.setAll(data);
     
+      
       // Make stuff animate on load
       // https://www.amcharts.com/docs/v5/concepts/animations/
       series.appear();
     }
-    
-    
+
     // Add cursor
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
     var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
@@ -117,7 +121,7 @@ am5.ready(function() {
     var legend = chart.rightAxesContainer.children.push(am5.Legend.new(root, {
       width: 200,
       paddingLeft: 15,
-      height: am5.percent(100)
+      height: am5.percent(150),
     }));
     
     // When legend item container is hovered, dim all the series except the hovered one
