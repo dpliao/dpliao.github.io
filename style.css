@@ -1,5 +1,21 @@
+body {
+    background-color: #dcdcdcc2;
+}
+
 #chartdiv {
-    width: 90%;
-    height: 500px;
+    width: 95%;
+    height: 600px;
     margin: 0 auto;
+    background-color: white;
+    font-size: small;
+}
+
+h2 {
+    color: white;
+    text-align: left;
+}
+
+li {
+    text-align: left;
+    font-size: medium;
 }

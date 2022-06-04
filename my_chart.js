@@ -21,7 +21,7 @@ am5.ready(function() {
       wheelX: "panX",
       wheelY: "zoomX",
       maxTooltipDistance: 0,
-      pinchZoomX:true
+      pinchZoomX: true
     }));
     
     
@@ -67,7 +67,7 @@ am5.ready(function() {
     
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var brands = ['TSMC', 'Applied Materials', 'ASML', 'SUMCO', 'TSMC-predicted', 'Applied Materials-predicted', 'ASML-predicted', 'SUMCO-predicted']
+    var brands = ['TSMC', 'AMAT', 'ASML', 'SUMCO', 'TSMC-predicted', 'AMAT-predicted', 'ASML-predicted', 'SUMCO-predicted']
     var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b', '#70bbf7','#ef8179', '#f6c940', '#69a86b']
 
     for (var i = 0; i < 8; i++) {
@@ -85,15 +85,12 @@ am5.ready(function() {
         })
       }));
       series.set("fill", am5.color(line_colors[i]));
-      series.strokes.template.set({
-        strokeDasharray: [2, 2],
-        strokeWidth: 2
-      });
-      if(i > 4) date = new Date(2020, 0, 0);
+
+      if(i < 4) date = new Date(2020, 0, 0);
       else {
         date = new Date(2021, 0, 0);
         series.strokes.template.setAll({
-          strokeDasharray: [2, 4],
+          strokeDasharray: [3, 3],
           strokeWidth: 2
         });
       }
@@ -184,4 +181,4 @@ am5.ready(function() {
     // https://www.amcharts.com/docs/v5/concepts/animations/
     chart.appear(1000, 100);
     
-    }); // end am5.ready()
+}); // end am5.ready()
