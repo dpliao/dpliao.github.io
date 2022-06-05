@@ -1,6 +1,20 @@
+function data_load()
+{
+  return new Promise((resolve, reject)=>{
+    let src_url = "http://127.0.0.1:8080/GetAll";
+    let xhr = new XMLHttpRequest();
+    xhr.open('get', src_url, true);
+    xhr.send();
+    xhr.onload = function () {
+      if (xhr.status == 200) {
+        resolve(JSON.parse(xhr.responseText));
+        // resolve(xhr.response);
+      }
+    };
+  });
+};
 
 am5.ready(function() {
-
     // Create root element
     // https://www.amcharts.com/docs/v5/getting-started/#Root_element 
     var root = am5.Root.new("chartdiv");
@@ -29,6 +43,9 @@ am5.ready(function() {
     date.setHours(0, 0, 0, 0);
     var value = 100;
     
+    var all_data = data_load();
+    console.log(all_data[1]);
+
     function generateData() {
       value = Math.round((Math.random() * 10 - 4.2) + value);
       am5.time.add(date, "day", 1);
@@ -38,7 +55,7 @@ am5.ready(function() {
         value: value
       };
     }
-    
+
     function generateDatas(count) {
       var data = [];
       for (var i = 0; i < count; ++i) {
