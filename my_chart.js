@@ -1,19 +1,3 @@
-function data_load()
-{
-  return new Promise((resolve, reject)=>{
-    let src_url = "http://127.0.0.1:8080/GetAll";
-    let xhr = new XMLHttpRequest();
-    xhr.open('get', src_url, true);
-    xhr.send();
-    xhr.onload = function () {
-      if (xhr.status == 200) {
-        resolve(JSON.parse(xhr.responseText));
-        // resolve(xhr.response);
-      }
-    };
-  });
-};
-
 am5.ready(function() {
     // Create root element
     // https://www.amcharts.com/docs/v5/getting-started/#Root_element 
@@ -43,8 +27,6 @@ am5.ready(function() {
     date.setHours(0, 0, 0, 0);
     var value = 100;
     
-    var all_data = data_load();
-    console.log(all_data[1]);
 
     function generateData() {
       value = Math.round((Math.random() * 10 - 4.2) + value);
@@ -84,44 +66,106 @@ am5.ready(function() {
     
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var brands = ['TSMC', 'AMAT', 'ASML', 'SUMCO', 'TSMC-predicted', 'AMAT-predicted', 'ASML-predicted', 'SUMCO-predicted']
+    var brands = ['TSMC', 'AM', 'ASML', 'SUMCO']
+    var labels = ['TSMC', 'AM', 'ASML', 'SUMCO', 'TSMC-predicted', 'AM-predicted', 'ASML-predicted', 'SUMCO-predicted']
     var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b', '#70bbf7','#ef8179', '#f6c940', '#69a86b']
 
-    for (var i = 0; i < 8; i++) {
-      var series = chart.series.push(am5xy.LineSeries.new(root, {
-        name: brands[i],
-        stroke: line_colors[i],
-        xAxis: xAxis,
-        yAxis: yAxis,
-        valueYField: "value",
-        valueXField: "date",
-        legendValueText: "{valueY}",
-        tooltip: am5.Tooltip.new(root, {
-          pointerOrientation: "vertical",
-          labelText: "{valueY}"
-        })
-      }));
-      series.set("fill", am5.color(line_colors[i]));
-
-      if(i < 4) date = new Date(2020, 0, 0);
-      else {
-        date = new Date(2021, 0, 0);
-        series.strokes.template.setAll({
-          strokeDasharray: [3, 3],
-          strokeWidth: 2
-        });
-      }
-      date.setHours(0, 0, 0, 0);
-      value = 0;
-    
-      var data = generateDatas(365);
-      series.data.setAll(data);
-    
-      
-      // Make stuff animate on load
-      // https://www.amcharts.com/docs/v5/concepts/animations/
-      series.appear();
+    const days = (date_1, date_2) =>{
+      let difference = date_1.getTime() - date_2.getTime();
+      let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
+      return TotalDays;
     }
+
+    function convertData(response) {
+      var all_data = {};
+      response = JSON.parse(response);
+      const date2 = new Date('2021-01-01');
+      const date1 = new Date();
+      for (var i = 0; i < labels.length; ++i) {
+        all_data[labels[i]] = [];
+        if (brands.includes(labels[i])) {
+          var start_index = 0;
+          var end_index = days(date1, date2);
+          var key = brands[i];
+        }
+        else {
+          var start_index = days(date1, date2) + 1;
+          var end_index = Object.keys(response).length;
+          var key = brands[i-4];
+        }
+        for (var j = start_index; j < end_index; j++){
+          // console.log(response[j]);
+          var day = new Date(response[j]["date"])
+          all_data[labels[i]].push({
+            date: day.getTime(),
+            value: parseInt(response[j][key])
+          });
+        }
+      }
+      return all_data;
+    }
+
+    function draw_chart(response) {
+      // var data = convertData(response);
+      // console.log(response);
+      var all_data = convertData(response);
+      for (var i = 0; i < labels.length; i++) {
+        var series = chart.series.push(am5xy.LineSeries.new(root, {
+          name: labels[i],
+          stroke: line_colors[i],
+          xAxis: xAxis,
+          yAxis: yAxis,
+          valueYField: "value",
+          valueXField: "date",
+          legendValueText: "{valueY}",
+          tooltip: am5.Tooltip.new(root, {
+            pointerOrientation: "vertical",
+            labelText: "{valueY}"
+          })
+        }));
+        series.set("fill", am5.color(line_colors[i]));
+  
+        if(i < 4) date = new Date("2021-01-01");
+        else {
+          date = new Date();
+          series.strokes.template.setAll({
+            strokeDasharray: [3, 3],
+            strokeWidth: 2
+          });
+        }
+        date.setHours(0, 0, 0, 0);
+        value = 0;
+      
+        var all_data = generateDatas(365);
+        // console.log("from generateDatas", data);
+        // console.log("from function", all_data[labels[i]]);
+        series.data.setAll(all_data);
+        // series.data.setAll(all_data[labels[i]]);
+      
+        
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        series.appear();
+      }
+    };
+
+    function data_load(draw_chart) {
+      let src_url = "http://127.0.0.1:8080/GetAll";
+      let xhr = new XMLHttpRequest();
+      xhr.open('get', src_url, true);
+      xhr.send();
+      xhr.onload = function () {
+        if (xhr.status == 200) {
+          // console.log(xhr.responseText);
+          draw_chart(xhr.responseText);
+        }
+        else {
+          console.log("Fail to receive data from backend API.");
+        }
+      };
+    };
+
+    data_load(draw_chart);
 
     // Add cursor
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
