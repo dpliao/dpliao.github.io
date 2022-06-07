@@ -1,17 +1,17 @@
 function data_load()
 {
-  return new Promise((resolve, reject)=>{
     let src_url = "http://127.0.0.1:8080/GetAll";
     let xhr = new XMLHttpRequest();
     xhr.open('get', src_url, true);
     xhr.send();
     xhr.onload = function () {
-      if (xhr.status == 200) {
-        resolve(JSON.parse(xhr.responseText));
-        // resolve(xhr.response);
-      }
+        if (xhr.status == 200) {
+        console.log(xhr.response);
+        }
+        else {
+        console.log("Cannot get data from backend API.")
+        }
     };
-  });
 };
 
 am5.ready(function() {
@@ -43,8 +43,7 @@ am5.ready(function() {
     date.setHours(0, 0, 0, 0);
     var value = 100;
     
-    var all_data = data_load();
-    console.log(all_data[1]);
+    data_load();
 
     function generateData() {
       value = Math.round((Math.random() * 10 - 4.2) + value);
