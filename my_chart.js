@@ -45,7 +45,7 @@ am5.ready(function() {
     
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var brands = ['TSMC', 'AM', 'ASML', 'SUMCO']
+    var brands = ['TSMC', 'ASML', 'AM', 'SUMCO']
     var predict_labels = []
     for (i in brands) predict_labels.push(brands[i] + '-predict');
     var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b']
@@ -58,7 +58,7 @@ am5.ready(function() {
       // const date1 = new Date();
       for (var i = 0; i < keys.length; ++i) {
         data[keys[i]] = [];
-        console.log(Object.keys(response).length);
+        // console.log(Object.keys(response).length);
         for (var j = 0; j < Object.keys(response).length; j++){
           // console.log(response[j]);
           var day = new Date(response[j]["date"])
@@ -203,7 +203,7 @@ am5.ready(function() {
       craw_xhr.send();
       craw_xhr.onload = function () {
         if (craw_xhr.status == 200) {
-          console.log(craw_xhr.responseText);
+          // console.log(craw_xhr.responseText);
           crawler_data = convertData(craw_xhr.responseText, brands);
         }
         else {
@@ -216,7 +216,7 @@ am5.ready(function() {
       pre_xhr.send();
       pre_xhr.onload = function () {
         if (pre_xhr.status == 200) {
-          console.log(pre_xhr.responseText);
+          // console.log(pre_xhr.responseText);
           var predict_data = convertData(pre_xhr.responseText, brands);
           draw_chart(crawler_data, predict_data);
         }
