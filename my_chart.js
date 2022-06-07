@@ -67,7 +67,7 @@ am5.ready(function() {
     // Add series
     // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
     var brands = ['TSMC', 'AM', 'ASML', 'SUMCO']
-    var labels = ['TSMC', 'AM', 'ASML', 'SUMCO', 'TSMC-predicted', 'AM-predicted', 'ASML-predicted', 'SUMCO-predicted']
+    var predict_labels = ['TSMC-predicted', 'AM-predicted', 'ASML-predicted', 'SUMCO-predicted']
     var line_colors = ['#70bbf7','#ef8179', '#f6c940', '#69a86b', '#70bbf7','#ef8179', '#f6c940', '#69a86b']
 
     const days = (date_1, date_2) =>{
@@ -76,42 +76,41 @@ am5.ready(function() {
       return TotalDays;
     }
 
-    function convertData(response) {
-      var all_data = {};
+    function convertData(response, keys) {
+      var data = {};
       response = JSON.parse(response);
-      const date2 = new Date('2021-01-01');
-      const date1 = new Date();
-      for (var i = 0; i < labels.length; ++i) {
-        all_data[labels[i]] = [];
-        if (brands.includes(labels[i])) {
-          var start_index = 0;
-          var end_index = days(date1, date2);
-          var key = brands[i];
-        }
-        else {
-          var start_index = days(date1, date2) + 1;
-          var end_index = Object.keys(response).length;
-          var key = brands[i-4];
-        }
-        for (var j = start_index; j < end_index; j++){
+      // const date2 = new Date('2021-01-01');
+      // const date1 = new Date();
+      for (var i = 0; i < keys.length; ++i) {
+        data[keys[i]] = [];
+        console.log(Object.keys(response).length);
+        for (var j = 0; j < Object.keys(response).length; j++){
           // console.log(response[j]);
           var day = new Date(response[j]["date"])
-          all_data[labels[i]].push({
+          data[keys[i]].push({
             date: day.getTime(),
-            value: parseInt(response[j][key])
+            value: parseInt(response[j][keys[i]])
           });
         }
       }
-      return all_data;
+      return data;
     }
 
-    function draw_chart(response) {
+    function draw_chart(crawler_data, predict_data) {
       // var data = convertData(response);
       // console.log(response);
-      var all_data = convertData(response);
-      for (var i = 0; i < labels.length; i++) {
+      // var all_data = convertData(response);
+      for (var i = 0; i < 8; i++) {
+        if (i < 4) {
+          data = crawler_data[brands[i]];
+          label = brands[i];
+        }
+        else {
+          data = predict_data[brands[i-4]];
+          label = predict_labels[i-4];
+        }
         var series = chart.series.push(am5xy.LineSeries.new(root, {
-          name: labels[i],
+          name: label,
           stroke: line_colors[i],
           xAxis: xAxis,
           yAxis: yAxis,
@@ -139,7 +138,7 @@ am5.ready(function() {
         // var all_data = generateDatas(365);
         // console.log("from generateDatas", data);
         // console.log("from function", all_data[labels[i]]);
-        series.data.setAll(all_data[labels[i]]);
+        series.data.setAll(data);
         // series.data.setAll(all_data[labels[i]]);
       
         
@@ -224,17 +223,33 @@ am5.ready(function() {
     };
 
     function data_load(draw_chart) {
-      let src_url = "http://127.0.0.1:8080/GetAll";
-      let xhr = new XMLHttpRequest();
-      xhr.open('get', src_url, true);
-      xhr.send();
-      xhr.onload = function () {
-        if (xhr.status == 200) {
-          // console.log(xhr.responseText);
-          draw_chart(xhr.responseText);
+      let crawler_url = "http://127.0.0.1:8080/GetAll/G";
+      let predict_url = "http://127.0.0.1:8080/GetAll/P";
+      var crawler_data;
+      let craw_xhr = new XMLHttpRequest();
+      craw_xhr.open('get', crawler_url, true);
+      craw_xhr.send();
+      craw_xhr.onload = function () {
+        if (craw_xhr.status == 200) {
+          console.log(craw_xhr.responseText);
+          crawler_data = convertData(craw_xhr.responseText, brands);
         }
         else {
-          console.log("Fail to receive data from backend API.");
+          console.log("Fail to receive crawler data from backend API.");
+        }
+      };
+
+      let pre_xhr = new XMLHttpRequest();
+      pre_xhr.open('get', predict_url, true);
+      pre_xhr.send();
+      pre_xhr.onload = function () {
+        if (pre_xhr.status == 200) {
+          console.log(pre_xhr.responseText);
+          var predict_data = convertData(pre_xhr.responseText, brands);
+          draw_chart(crawler_data, predict_data);
+        }
+        else {
+          console.log("Fail to receive predict data from backend API.");
         }
       };
     };
